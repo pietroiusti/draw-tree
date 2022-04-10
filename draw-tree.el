@@ -1,12 +1,12 @@
 ;; -*- lexical-binding: t -*-
 
+(defvar draw-tree-result nil "holds return value of draw-tree")
+(defconst *nothing* (cons 'N '()))
+(defconst *visited* (cons 'V '()))
+
 (defun draw-tree (n)
 
-  (setq dt-result "\n")
-
-  (setq *nothing* (cons 'N '()))
-
-  (setq *visited* (cons 'V '()))
+  (setq draw-tree-result "\n")
 
   (defun emptyp (x) (eq x *nothing*))
 
@@ -25,8 +25,8 @@
            (s (if (> k 7) (substring s 0 7) s))
            (s (if (< k 3) (concat " " s) s))
            (k (length s)))
-      (set 'dt-result
-	   (concat dt-result (concat s (substring b 0 (- 8 k)))))))
+      (setq draw-tree-result
+	   (concat draw-tree-result (concat s (substring b 0 (- 8 k)))))))
 
   (defun draw-atom (n)
     (cond ((null n)
@@ -52,10 +52,10 @@
              (draw-atom n)
              (nreverse r))
             ((null (cdr n))
-             (set 'dt-result (concat dt-result "[o|/]"))
+             (setq draw-tree-result (concat draw-tree-result "[o|/]"))
              (nreverse (cons (car n) r)))
             (t
-             (set 'dt-result (concat dt-result "[o|o]---"))
+             (setq draw-tree-result (concat draw-tree-result "[o|o]---"))
              (draw-conses-inner (cdr n) (cons (car n) r)))))
     (draw-conses-inner n '()))
 
@@ -127,14 +127,14 @@
 
   (defun draw-tree-inner (n)
     (if (not (donep n))
-        (progn (set 'dt-result (concat dt-result "\n"))
+        (progn (setq draw-tree-result (concat draw-tree-result "\n"))
                (draw-bars n)
-               (set 'dt-result (concat dt-result "\n"))
+               (setq draw-tree-result (concat draw-tree-result "\n"))
                (draw-tree-inner (draw-members n)))))
   
   (if (not (consp n))
       (draw-atom n)
     (draw-tree-inner (mark-visited (draw-conses n))))
   
-  (set 'dt-result (concat dt-result "\n"))
-  dt-result)
+  (setq draw-tree-result (concat draw-tree-result "\n"))
+  draw-tree-result)
