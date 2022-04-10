@@ -1,5 +1,16 @@
 ;; -*- lexical-binding: t -*-
 
+;; draw-tree
+
+;; Display tree of cons cells.
+
+;; Ported to Emacs Lisp by Giulio Pietroiusti from Nils M Holm's Scheme 9
+;; from Empty Space's Function Library
+;; (http://www.t3x.org/s9fes/draw-tree.scm.html) and its Common Lisp port
+;; written by CBaggers (https://github.com/cbaggers/draw-cons-tree).
+
+;; Placed in the Public Domain.
+
 (defvar draw-tree-result "" "holds return value of draw-tree")
 (defconst draw-tree-*nothing* (cons 'N '()))
 (defconst draw-tree-*visited* (cons 'V '()))
