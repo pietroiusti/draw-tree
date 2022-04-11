@@ -1,18 +1,33 @@
 ;; -*- lexical-binding: t -*-
 
-;; draw-tree
+;; draw-tree.el
 
-;; Print a tree structure resembling an Emacs Lisp datum. Each cons
-;; cell is represented by [o|o] with lines leading to their car and
-;; cdr parts. Conses with a cdr value of () are represented by [o|/].
+;; Draw tree structure of cons cells
 
 ;; Ported to Emacs Lisp from Nils M Holm's Scheme 9 from Empty Space's
 ;; Function Library (http://www.t3x.org/s9fes/draw-tree.scm.html) and
 ;; its Common Lisp port written by CBaggers
-;; (https://github.com/cbaggers/draw-cons-tree).
+;; (https://github.com/cbaggers/draw-cons-tree)
 
 ;; Giulio Pietroiusti, 2022
 ;; Placed in the Public Domain
+
+;; Example:
+;;
+;; (draw-tree '((a) (b . c) (d e)))  ==> 
+;; "
+;; [o|o]---[o|o]---[o|/]
+;;  |       |       |      
+;; [o|/]    |      [o|o]---[o|/]
+;;  |       |       |       |      
+;;  a       |       d       e      
+;;          |      
+;;         [o|o]--- c      
+;;          |      
+;;          b      
+;; "
+
+(require 'cl-lib)
 
 (defvar draw-tree-result "" "holds return value of draw-tree")
 (defconst draw-tree-*nothing* (cons 'N '()))
@@ -57,32 +72,32 @@
 	 (error "draw-tree-draw-atom: unknown type" n))))
 
 (defun draw-tree-draw-conses (n)
-  (defun draw-tree-draw-conses-inner (n r)
-    (cond ((not (consp n))
-           (draw-tree-draw-atom n)
-           (nreverse r))
-          ((null (cdr n))
-           (setq draw-tree-result (concat draw-tree-result "[o|/]"))
-           (nreverse (cons (car n) r)))
-          (t
-           (setq draw-tree-result (concat draw-tree-result "[o|o]---"))
-           (draw-tree-draw-conses-inner (cdr n) (cons (car n) r)))))
-  (draw-tree-draw-conses-inner n '()))
-
+  (cl-labels ((draw-tree-draw-conses (n r)
+				     (cond ((not (consp n))
+					    (draw-tree-draw-atom n)
+					    (nreverse r))
+					   ((null (cdr n))
+					    (setq draw-tree-result (concat draw-tree-result "[o|/]"))
+					    (nreverse (cons (car n) r)))
+					   (t
+					    (setq draw-tree-result (concat draw-tree-result "[o|o]---"))
+					    (draw-tree-draw-conses (cdr n) (cons (car n) r))))))
+    (draw-tree-draw-conses n '())))
+	
 (defun draw-tree-draw-bars (n)
-  (defun draw-tree-draw-bars-inner (n)
-    (cond ((not (consp n)) nil)
-          ((draw-tree-emptyp (car n))
-           (draw-tree-draw-fixed-string "")
-           (draw-tree-draw-bars-inner (cdr n)))
-          ((and (consp (car n))
-                (draw-tree-visitedp (car n)))
-           (draw-tree-draw-bars-inner (draw-tree-members-of (car n)))
-           (draw-tree-draw-bars-inner (cdr n)))
-          (t
-           (draw-tree-draw-fixed-string "|")
-           (draw-tree-draw-bars-inner (cdr n)))))
-  (draw-tree-draw-bars-inner (draw-tree-members-of n)))
+  (cl-labels ((draw-tree-draw-bars (n)
+				   (cond ((not (consp n)) nil)
+					 ((draw-tree-emptyp (car n))
+					  (draw-tree-draw-fixed-string "")
+					  (draw-tree-draw-bars (cdr n)))
+					 ((and (consp (car n))
+					       (draw-tree-visitedp (car n)))
+					  (draw-tree-draw-bars (draw-tree-members-of (car n)))
+					  (draw-tree-draw-bars (cdr n)))
+					 (t
+					  (draw-tree-draw-fixed-string "|")
+					  (draw-tree-draw-bars (cdr n))))))
+    (draw-tree-draw-bars (draw-tree-members-of n))))
 
 (defun draw-tree-skip-empty (n)
   (if (and (consp n)
@@ -100,31 +115,31 @@
            (draw-tree-all-verticalp (car n)))))
 
 (defun draw-tree-draw-members (n)
-  (defun draw-tree-draw-members-inner (n r)
-    (cond ((not (consp n))
-           (draw-tree-mark-visited
-            (remove-trailing-nothing
-             (reverse r))))
-          ((draw-tree-emptyp (car n))
-           (draw-tree-draw-fixed-string "")
-           (draw-tree-draw-members-inner (cdr n)
-			       (cons draw-tree-*nothing* r)))
-          ((not (consp (car n)))
-           (draw-tree-draw-atom (car n))
-           (draw-tree-draw-members-inner (cdr n)
-			       (cons draw-tree-*nothing* r)))
-          ((null (cdr n))
-           (draw-tree-draw-members-inner (cdr n)
-			       (cons (draw-final (car n)) r)))
-          ((draw-tree-all-verticalp (car n))
-           (draw-tree-draw-fixed-string "[o|/]")
-           (draw-tree-draw-members-inner (cdr n)
-			       (cons (caar n) r)))
-          (t
-           (draw-tree-draw-fixed-string "|")
-           (draw-tree-draw-members-inner (cdr n)
-			       (cons (car n) r)))))
-  (draw-tree-draw-members-inner (draw-tree-members-of n) '()))
+  (cl-labels ((draw-tree-draw-members (n r)
+				      (cond ((not (consp n))
+					     (draw-tree-mark-visited
+					      (remove-trailing-nothing
+					       (reverse r))))
+					    ((draw-tree-emptyp (car n))
+					     (draw-tree-draw-fixed-string "")
+					     (draw-tree-draw-members (cdr n)
+								     (cons draw-tree-*nothing* r)))
+					    ((not (consp (car n)))
+					     (draw-tree-draw-atom (car n))
+					     (draw-tree-draw-members (cdr n)
+								     (cons draw-tree-*nothing* r)))
+					    ((null (cdr n))
+					     (draw-tree-draw-members (cdr n)
+								     (cons (draw-final (car n)) r)))
+					    ((draw-tree-all-verticalp (car n))
+					     (draw-tree-draw-fixed-string "[o|/]")
+					     (draw-tree-draw-members (cdr n)
+								     (cons (caar n) r)))
+					    (t
+					     (draw-tree-draw-fixed-string "|")
+					     (draw-tree-draw-members (cdr n)
+								     (cons (car n) r))))))
+    (draw-tree-draw-members (draw-tree-members-of n) '())))
 
 (defun draw-tree-draw-final (n)
   (cond ((not (consp n))
@@ -137,17 +152,17 @@
 
 (defun draw-tree (n)
   (setq draw-tree-result "\n")
-
-  (defun draw-tree-inner (n)
-    (if (not (draw-tree-donep n))
-        (progn (setq draw-tree-result (concat draw-tree-result "\n"))
-               (draw-tree-draw-bars n)
-               (setq draw-tree-result (concat draw-tree-result "\n"))
-               (draw-tree-inner (draw-tree-draw-members n)))))
   
-  (if (not (consp n))
-      (draw-tree-draw-atom n)
-    (draw-tree-inner (draw-tree-mark-visited (draw-tree-draw-conses n))))
+  (cl-labels ((draw-tree (n)
+			 (if (not (draw-tree-donep n))
+			     (progn (setq draw-tree-result (concat draw-tree-result "\n"))
+				    (draw-tree-draw-bars n)
+				    (setq draw-tree-result (concat draw-tree-result "\n"))
+				    (draw-tree (draw-tree-draw-members n))))))
+    (if (not (consp n))
+	(draw-tree-draw-atom n)
+      (draw-tree (draw-tree-mark-visited (draw-tree-draw-conses n)))))
   
   (setq draw-tree-result (concat draw-tree-result "\n"))
+  
   draw-tree-result)
