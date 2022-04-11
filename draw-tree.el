@@ -130,7 +130,7 @@
 								     (cons draw-tree-*nothing* r)))
 					    ((null (cdr n))
 					     (draw-tree-draw-members (cdr n)
-								     (cons (draw-final (car n)) r)))
+								     (cons (draw-tree-draw-final (car n)) r)))
 					    ((draw-tree-all-verticalp (car n))
 					     (draw-tree-draw-fixed-string "[o|/]")
 					     (draw-tree-draw-members (cdr n)
