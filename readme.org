@@ -2,7 +2,9 @@
   
 draw-tree
 
-Display tree of cons cells.
+Print a tree structure resembling an Emacs Lisp datum. Each cons cell
+is represented by [o|o] with lines leading to their car and cdr
+parts. Conses with a cdr value of () are represented by [o|/].
 
 Ported to Emacs Lisp from Nils M Holm's Scheme 9 from Empty Space's
 Function Library (http://www.t3x.org/s9fes/draw-tree.scm.html) and its
@@ -26,3 +28,7 @@ Example:
 ;;          b      
 ;; "
 #+end_src
+
+See also:
+- [[https://github.com/zainab-ali/pair-tree.el][pair-tree.el]]
+- [[https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-15.html#%_sec_2.2][SICP, box-and-pointer notation]]

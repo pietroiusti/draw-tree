@@ -2,14 +2,17 @@
 
 ;; draw-tree
 
-;; Display tree of cons cells.
+;; Print a tree structure resembling an Emacs Lisp datum. Each cons
+;; cell is represented by [o|o] with lines leading to their car and
+;; cdr parts. Conses with a cdr value of () are represented by [o|/].
 
-;; Ported to Emacs Lisp by Giulio Pietroiusti from Nils M Holm's Scheme 9
-;; from Empty Space's Function Library
-;; (http://www.t3x.org/s9fes/draw-tree.scm.html) and its Common Lisp port
-;; written by CBaggers (https://github.com/cbaggers/draw-cons-tree).
+;; Ported to Emacs Lisp from Nils M Holm's Scheme 9 from Empty Space's
+;; Function Library (http://www.t3x.org/s9fes/draw-tree.scm.html) and
+;; its Common Lisp port written by CBaggers
+;; (https://github.com/cbaggers/draw-cons-tree).
 
-;; Placed in the Public Domain.
+;; Giulio Pietroiusti, 2022
+;; Placed in the Public Domain
 
 (defvar draw-tree-result "" "holds return value of draw-tree")
 (defconst draw-tree-*nothing* (cons 'N '()))
