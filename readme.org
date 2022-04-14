@@ -31,4 +31,8 @@ Example:
 See also:
 - [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Box-Diagrams.html][GNU Emacs Manual, Drawing Lists as Box Diagrams]]
 - [[https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-15.html#%_sec_2.2][SICP, box-and-pointer notation]]
+- amno1's [[https://github.com/amno1/draw-cons-tree][draw-cons-tree]]. (Analogous port, slightly different in that
+  it inserts the result in the buffer as a side effect, rather than
+  returning it. It allows to draw lines with unicode. Discovered after
+  I wrote mine.)
 - [[https://github.com/zainab-ali/pair-tree.el][pair-tree.el]]
